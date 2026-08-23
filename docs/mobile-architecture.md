@@ -147,6 +147,119 @@ Because the application uses native modules, runtime testing uses development
 builds rather than Expo Go. Agents provide commands and stop before native build
 execution; the user performs device and emulator verification.
 
+## Future scaling guidance
+
+Unicon is expected to grow beyond static screens into authenticated social
+features such as feeds, posts, profiles, clubs, messaging, notifications, and
+media. The current feature-oriented structure can support that growth if new
+state and infrastructure remain separated by responsibility.
+
+These notes are decision guidance, not approval to introduce the referenced
+libraries or subsystems before a feature requires them.
+
+### State ownership
+
+Do not put all application state into one global store. Classify state before
+choosing its owner:
+
+```text
+remote server state        → query/cache layer
+authentication lifecycle  → focused session coordinator
+cross-screen client state  → small shared store when genuinely necessary
+ephemeral presentation    → local component or feature state
+```
+
+Remote entities, pagination, request status, invalidation, and optimistic
+updates should be managed by a server-state solution selected when real API
+requirements are known. React Context or a general client store should not
+become an ad hoc replacement for a normalized server cache.
+
+### Authentication and API boundary
+
+Authentication infrastructure should be shared but isolated from screens. A
+session coordinator will need to own secure token persistence, cold-start
+restoration, refresh rotation, request retry, terminal session failure, and
+logout behavior.
+
+Only one refresh operation may run at a time. Requests waiting on refresh should
+resume from the same coordinated result rather than each rotating the refresh
+token independently. UI components must consume authenticated API behavior
+through a stable boundary and must not read or rotate raw tokens themselves.
+
+API errors should be mapped from the backend's machine-readable contract at the
+transport boundary. Feature code should not branch on human-readable backend
+messages.
+
+### Feed and shared entities
+
+Feed architecture must account for cursor pagination, deduplication, scroll
+restoration, optimistic reactions, deletion, and the same entity appearing in
+multiple surfaces such as a feed, profile, club, or detail screen.
+
+Before implementing feed mutations, define stable query identities and cache
+update rules. Avoid copying independent mutable versions of the same post into
+unrelated feature stores. Optimistic updates must have explicit rollback and
+server-reconciliation behavior.
+
+### Messaging and realtime
+
+Messaging should be treated as a bounded subsystem rather than an extension of
+ordinary REST hooks. Its design will need to address connection lifecycle,
+reconnect, ordering, acknowledgements, optimistic sending, retries, unread
+state, local persistence, background behavior, and push-notification
+reconciliation.
+
+Do not introduce a global realtime client until its ownership, authentication,
+foreground/background lifecycle, and failure behavior are defined.
+
+### Media workflows
+
+Media selection, processing, upload, and domain-object creation are separate
+steps. The media layer may need permissions, compression, progress,
+cancellation, retry, background limitations, signed upload targets, and cleanup
+of abandoned uploads.
+
+Posts or messages should not assume that starting an upload means the final
+domain object was successfully created. Model intermediate and recoverable
+states explicitly.
+
+### Shared UI threshold
+
+Keep a component inside its feature until multiple real consumers demonstrate
+that it has a stable, feature-independent API. A shared UI directory must not
+become a collection of components extracted only because their markup looks
+temporarily similar.
+
+Likewise, promote hooks, services, and types to shared infrastructure only when
+their ownership is genuinely cross-feature. Prefer small explicit duplication
+over a premature abstraction that couples unrelated product areas.
+
+### Animation lifecycle
+
+The Welcoming Rive adapter is a feature-specific boundary, not automatically a
+global animation framework. If Rive usage expands, evaluate preload, reuse,
+memory ownership, viewport visibility, and application background/foreground
+lifecycle from the requirements of those consumers.
+
+Do not keep many native animation instances mounted without measuring memory
+and rendering cost on representative Android and Apple devices.
+
+### Testing priorities
+
+As infrastructure grows, prioritize tests around state transitions and failure
+semantics rather than visual implementation details. High-value areas include:
+
+- session restoration and refresh coordination;
+- API error mapping;
+- pagination, cache reconciliation, and optimistic rollback;
+- Rive orchestration with a mocked adapter boundary;
+- message ordering, retry, and acknowledgement behavior;
+- upload cancellation and recovery;
+- critical navigation and authentication smoke flows.
+
+Static checks and JavaScript tests do not replace device verification for native
+runtime, background lifecycle, notifications, media permissions, or Rive.
+
 ## Evolution rules
 
 When introducing a new feature:
