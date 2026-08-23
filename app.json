@@ -1,15 +1,19 @@
 {
   "expo": {
-    "name": "unicon-mobile-rive-spike",
-    "slug": "unicon-mobile-rive-spike",
+    "name": "Unicon",
+    "slug": "unicon-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "unicon",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "appleTeamId": "QN7XQAWG9C",
+      "bundleIdentifier": "com.unicon.mobile"
     },
     "android": {
+      "package": "com.unicon.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -18,8 +22,16 @@
       },
       "predictiveBackGestureEnabled": false
     },
+    "experiments": {
+      "typedRoutes": true
+    },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-splash-screen"
+    ]
   }
 }
