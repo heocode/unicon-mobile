@@ -30,6 +30,8 @@ profile.
   layering, responsive layout, styling, accessibility, and native-project policy
 - [`docs/welcoming-rive-contract.md`](docs/welcoming-rive-contract.md) — Rive
   asset contract, adapter lifecycle, orchestration, and rapid-swipe behavior
+- [`docs/launch-rive-contract.md`](docs/launch-rive-contract.md) — launch asset
+  contract, native splash handoff, playback, and failure watchdog
 
 Read `AGENTS.md` before changing the repository. Use `package.json`, the
 lockfile, application configuration, and typed feature configuration as the

@@ -13,6 +13,8 @@ import { theme } from '@/theme/tokens';
 
 import { LaunchAnimation } from './LaunchAnimation';
 
+const LAUNCH_TIMEOUT_MS = 5_000;
+
 function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(Math.max(value, minimum), maximum);
 }
@@ -22,6 +24,7 @@ export function LaunchGate({ children }: PropsWithChildren) {
   const opacity = useRef(new Animated.Value(1)).current;
   const hasHiddenNativeSplashRef = useRef(false);
   const hasFinishedRef = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reducedMotion = useReducedMotion();
   const { width } = useWindowDimensions();
   const viewportSize = clamp(width * 0.62, 220, 300);
@@ -33,10 +36,18 @@ export function LaunchGate({ children }: PropsWithChildren) {
     }
   }, []);
 
+  const clearLaunchTimeout = useCallback(() => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
   const finish = useCallback(
     (animated: boolean) => {
       if (hasFinishedRef.current) return;
       hasFinishedRef.current = true;
+      clearLaunchTimeout();
 
       if (!animated) {
         opacity.setValue(0);
@@ -50,7 +61,7 @@ export function LaunchGate({ children }: PropsWithChildren) {
         useNativeDriver: true,
       }).start(() => setVisible(false));
     },
-    [opacity],
+    [clearLaunchTimeout, opacity],
   );
 
   const handleComplete = useCallback(() => finish(true), [finish]);
@@ -62,6 +73,15 @@ export function LaunchGate({ children }: PropsWithChildren) {
     },
     [finish, hideNativeSplash],
   );
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      hideNativeSplash();
+      finish(false);
+    }, LAUNCH_TIMEOUT_MS);
+
+    return clearLaunchTimeout;
+  }, [clearLaunchTimeout, finish, hideNativeSplash]);
 
   useEffect(() => {
     if (reducedMotion === true) {

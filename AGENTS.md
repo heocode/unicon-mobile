@@ -5,6 +5,7 @@ architecture documents when working in their area:
 
 - [`docs/mobile-architecture.md`](docs/mobile-architecture.md)
 - [`docs/welcoming-rive-contract.md`](docs/welcoming-rive-contract.md)
+- [`docs/launch-rive-contract.md`](docs/launch-rive-contract.md)
 
 This file defines long-lived repository rules. Use `package.json`, the lockfile,
 application configuration, typed source configuration, and architecture docs as
@@ -177,6 +178,32 @@ failure semantics are documented in
 
 The complete sequence and rapid-swipe behavior are specified in
 [`docs/welcoming-rive-contract.md`](docs/welcoming-rive-contract.md).
+
+## Launch animation invariants
+
+The launch asset exposes this external contract:
+
+```text
+State Machine: LaunchAnimation
+View Model:    LaunchAnimation
+
+Input:  start
+Output: complete
+```
+
+- Wait for native Rive view readiness, explicitly start playback, then hide the
+  native splash and fire `start` without waiting for user interaction.
+- Treat `complete` as the only successful Rive completion signal.
+- Keep the 5-second end-to-end watchdog as a failure escape hatch only. On
+  timeout or runtime failure, remove the splash and overlay so startup fails
+  open; never report the timeout as successful animation completion.
+- Clear the watchdog after completion, failure, Reduced Motion handling, and
+  unmount, and guard startup completion against racing callbacks.
+- Do not edit or patch `assets/rive/launch.riv`; coordinate contract changes
+  with a new user-owned Rive Editor export.
+
+The complete startup sequence and failure semantics are documented in
+[`docs/launch-rive-contract.md`](docs/launch-rive-contract.md).
 
 ## Accessibility and reduced motion
 
