@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useReducedMotion } from '@/shared/hooks/useReducedMotion';
+
 import { useWelcomingOrchestrator } from '../animation/useWelcomingOrchestrator';
 import { WelcomingButton } from '../components/WelcomingButton';
 import { WelcomingCarousel } from '../components/WelcomingCarousel';
 import { WelcomingIllustration } from '../components/WelcomingIllustration';
 import { WelcomingPagination } from '../components/WelcomingPagination';
 import { welcomingSlides } from '../config/welcomingSlides';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { useWelcomingLayout } from '../hooks/useWelcomingLayout';
 import type { WelcomingIndex } from '../types/welcoming.types';
 
@@ -102,6 +103,7 @@ export function WelcomingScreen() {
       >
         <WelcomingButton
           onPress={handleGetStarted}
+          reducedMotion={reducedMotion}
           width={layout.buttonWidth}
         />
       </View>

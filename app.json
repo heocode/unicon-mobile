@@ -15,7 +15,7 @@
     "android": {
       "package": "com.unicon.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#DDE9FA",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -31,7 +31,15 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-splash-screen"
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F8FAFD",
+          "image": "./assets/splash-transparent.png",
+          "imageWidth": 1,
+          "resizeMode": "contain"
+        }
+      ]
     ]
   }
 }

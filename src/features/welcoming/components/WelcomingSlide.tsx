@@ -20,7 +20,7 @@ export function WelcomingSlide({ contentTop, slide, width }: Props) {
       <Text className="font-semibold text-[32px] leading-[41px] text-foreground">
         {slide.title}
       </Text>
-      <Text className="mt-1.5 text-center font-medium text-base leading-[19px] text-foreground">
+      <Text className="mt-1.5 text-center font-medium text-lg leading-[23px] text-foreground">
         {slide.subtitle.map((segment, index) => (
           <Text
             className={segment.emphasized ? 'font-semibold' : 'font-medium'}
